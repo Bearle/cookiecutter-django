@@ -33,6 +33,16 @@ production-ready Django projects quickly.
 .. _528: https://github.com/pydanny/cookiecutter-django/issues/528#issuecomment-212650373
 .. _issues: https://github.com/pydanny/cookiecutter-django/issues/new
 
+Differences from original
+--------------------------
+
+
+* Removed Amazon S3 (django-storages)
+* Removed django-crispy-forms
+* Removed Anymail
+* Added django-constance
+
+
 Features
 ---------
 
@@ -46,8 +56,6 @@ Features
 * Registration via django-allauth_
 * Comes with custom user model ready to go
 * Optional custom static build using Gulp and livereload
-* Send emails via Anymail_ (using Mailgun_ by default, but switchable)
-* Media storage using Amazon S3
 * Docker support using docker-compose_ for development and production (using Caddy_ with LetsEncrypt_ support)
 * Procfile_ for deploying to Heroku
 * Instructions for deploying to PythonAnywhere_
