@@ -26,7 +26,6 @@ django-allauth==0.38.0  # https://github.com/pennersr/django-allauth
 django-compressor==2.2  # https://github.com/django-compressor/django-compressor
 {%- endif %}
 django-redis==4.10.0  # https://github.com/niwinz/django-redis
-django-redis==4.9.0  # https://github.com/niwinz/django-redis
 django-constance==2.3.1 # https://github.com/jazzband/django-constance
 
 # Django REST Framework
