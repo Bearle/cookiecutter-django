@@ -16,6 +16,9 @@ if READ_DOT_ENV_FILE:
 
 # GENERAL
 # ------------------------------------------------------------------------------
+{% if cookiecutter.use_docker == 'y' -%}
+DOCKERIZED = env.bool("USE_DOCKER", False)
+{%- endif %}
 # https://docs.djangoproject.com/en/dev/ref/settings/#debug
 DEBUG = env.bool('DJANGO_DEBUG', False)
 # Local time zone. Choices are
@@ -37,9 +40,15 @@ USE_TZ = True
 # DATABASES
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#databases
+
 {% if cookiecutter.use_docker == 'y' -%}
+if DOCKERIZED:
+    default_db_url = 'postgres://postgres:@postgres:5432/postgres'
+else:
+    default_db_url = 'postgres://{% if cookiecutter.windows == 'y' %}localhost{% endif %}/{{cookiecutter.project_slug}}'
+
 DATABASES = {
-    'default': env.db('DATABASE_URL', default='postgres://postgres:@postgres:5432/postgres'),
+    'default': env.db('DATABASE_URL', default=default_db_url),
 }
 {%- else %}
 DATABASES = {
@@ -77,6 +86,7 @@ THIRD_PARTY_APPS = [
 LOCAL_APPS = [
     '{{ cookiecutter.project_slug }}.users.apps.UsersAppConfig',
     # Your stuff: custom apps go here
+    '{{cookiecutter.project_slug}}.main.apps.MainConfig'
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -234,7 +244,11 @@ if USE_TZ:
     CELERY_TIMEZONE = TIME_ZONE
 # http://docs.celeryproject.org/en/latest/userguide/configuration.html#std:setting-broker_url
 {% if cookiecutter.use_docker == 'y' -%}
-CELERY_BROKER_URL = env('CELERY_BROKER_URL', default='redis://redis:6379/0')
+if DOCKERIZED:
+    CELERY_BROKER_HOST = 'redis'
+else:
+    CELERY_BROKER_HOST = 'localhost'
+CELERY_BROKER_URL = env('CELERY_BROKER_URL', default='redis://'+CELERY_BROKER_HOST+':6379/0')
 {%- else %}
 CELERY_BROKER_URL = env('CELERY_BROKER_URL', default='redis://localhost:6379/0')
 {%- endif %}
@@ -282,7 +296,7 @@ STATICFILES_FINDERS += ['compressor.finders.CompressorFinder']
 # https://django-constance.readthedocs.io/en/latest/
 {% if cookiecutter.use_docker == 'y' -%}
 CONSTANCE_REDIS_CONNECTION = {
-        'host': 'redis',
+        'host': CELERY_BROKER_HOST,
         'port': 6379,
         'db': 0,
 }
